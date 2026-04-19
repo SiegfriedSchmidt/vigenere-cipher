@@ -27,7 +27,7 @@ export const Label = styled.label`
     font-size: 0.85rem;
     font-weight: 500;
     text-transform: uppercase;
-    letter-spacing: 0.5px;
+    letter-spacing: 1px;
     color: #555;
     margin-bottom: 0.5rem;
 `;
@@ -112,4 +112,49 @@ export const FooterNote = styled.div`
     text-align: center;
     border-top: 1px solid #eee;
     padding-top: 1.5rem;
+`;
+
+export const LinkSection = styled.div`
+    margin-top: 1.5rem;
+    margin-bottom: 0.5rem;
+    text-align: center;
+`;
+
+export const GithubLink = styled.a`
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.6rem 1.2rem;
+    background: #f5f5f5;
+    color: #24292e;
+    text-decoration: none;
+    border-radius: 24px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    font-family: inherit;
+    border: 1px solid #e0e0e0;
+
+    &:hover {
+        background: #e8e8e8;
+        border-color: #3b82f6;
+        transform: translateY(-1px);
+    }
+
+    svg {
+        width: 18px;
+        height: 18px;
+        fill: #24292e;
+    }
+`;
+
+export const CodeBadge = styled.span`
+    background: #e8e8e8;
+    color: #555;
+    padding: 0.2rem 0.6rem;
+    border-radius: 12px;
+    font-size: 0.7rem;
+    font-family: 'Fira Code', monospace;
+    margin-left: 0.5rem;
+    border: 1px solid #d0d0d0;
 `;
