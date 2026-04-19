@@ -1,8 +1,8 @@
-import {createBrowserRouter, createRoutesFromElements, Route, RouterProvider} from "react-router-dom";
+import {createHashRouter, createRoutesFromElements, Route, RouterProvider} from "react-router-dom";
 import RootLayout from "./layouts/RootLayout.tsx";
 import HomePage from "./pages/HomePage.tsx";
 
-const router = createBrowserRouter(createRoutesFromElements(
+const router = createHashRouter(createRoutesFromElements(
   <Route element={<RootLayout/>}>
     <Route index element={<HomePage/>}/>
   </Route>
