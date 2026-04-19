@@ -12,6 +12,7 @@ export default defineConfig({
     //   key: await Bun.file('./certs/server-key.pem').text()
     // },
   },
+  base: process.env.NODE_ENV === 'production' ? '/vigenere-cipher/' : '/',
   plugins: [
     react(),
     babel({presets: [reactCompilerPreset()]})
