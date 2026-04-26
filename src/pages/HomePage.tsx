@@ -6,22 +6,28 @@ import {
   FooterNote,
   GithubLink,
   Input,
-  Label, LinkSection,
+  Label,
+  LinkSection,
   Row,
   Section,
   Select,
   TextArea,
-  Title
+  Title,
+  ButtonGroup,
+  ActionButton,
+  CopyNotification
 } from "../styles/StyledComponents.ts";
 import {vigenere, cleanText} from "../crypto/vigenere.ts";
-
-const GITHUB_ALGORITHM_URL = "https://github.com/SiegfriedSchmidt/vigenere-cipher/blob/main/src/crypto/vigenere.ts"
+import {GITHUB_ALGORITHM_URL, LONG_TEXT_FILENAME, TEST_TEXTS} from "../types/constants.ts";
 
 const HomePage: React.FC = () => {
   const [message, setMessage] = useState<string>('CRYPTO');
   const [secretKey, setSecretKey] = useState<string>('KEY');
   const [cipherMode, setCipherMode] = useState<CipherMode>('encrypt');
   const [gammaMode, setGammaMode] = useState<GammaMode>('repeat');
+  const [showCopyNotification, setShowCopyNotification] = useState(false);
+  const [longText, setLongText] = useState<string>('');
+  const [isLoadingLongText, setIsLoadingLongText] = useState(false);
 
   const {cipherText, gamma} = useMemo(
     () => {
@@ -41,6 +47,42 @@ const HomePage: React.FC = () => {
     setSecretKey(cleanText(e.target.value));
   };
 
+  const insertTestText = (text: string) => {
+    setMessage(text);
+  };
+
+  const copyToClipboard = async (text: string) => {
+    if (!text) return;
+
+    try {
+      await navigator.clipboard.writeText(text);
+      setShowCopyNotification(true);
+      setTimeout(() => setShowCopyNotification(false), 2000);
+    } catch (err) {
+      console.error('Failed to copy:', err);
+    }
+  };
+
+  const loadLongText = async () => {
+    if (longText) return setMessage(longText);
+
+    setIsLoadingLongText(true);
+    let text = "THISISAFALLBACKTEXTIFYOUDONTHAVETHEFILEINPUBLICFOLDER" // fallback
+    try {
+      const promise = new Promise(resolve => setTimeout(resolve, 1000));
+      const response = await fetch(LONG_TEXT_FILENAME);
+      await promise
+
+      text = cleanText(await response.text())
+    } catch (error) {
+      console.error('Failed to load text file:', error);
+    } finally {
+      setLongText(text);
+      setMessage(text);
+      setIsLoadingLongText(false);
+    }
+  };
+
   return (
     <Container>
       <Title>Шифр Виженера</Title>
@@ -52,6 +94,17 @@ const HomePage: React.FC = () => {
           onChange={handleMessageChange}
           placeholder="Введите сообщение..."
         />
+        <ButtonGroup>
+          <ActionButton onClick={() => insertTestText(TEST_TEXTS.short)}>
+            Короткий
+          </ActionButton>
+          <ActionButton onClick={loadLongText} disabled={isLoadingLongText}>
+            {isLoadingLongText ? 'Загрузка...' : 'Длинный'}
+          </ActionButton>
+          <ActionButton onClick={() => insertTestText(TEST_TEXTS.alphabet)}>
+            Алфавит
+          </ActionButton>
+        </ButtonGroup>
       </Section>
 
       <Section>
@@ -105,6 +158,16 @@ const HomePage: React.FC = () => {
           readOnly
           placeholder="Результат появится здесь..."
         />
+        {cipherText && (
+          <ButtonGroup>
+            <ActionButton
+              $variant="success"
+              onClick={() => copyToClipboard(cipherText)}
+            >
+              📋 Копировать {cipherMode === 'encrypt' ? 'шифротекст' : 'текст'}
+            </ActionButton>
+          </ButtonGroup>
+        )}
       </Section>
 
       <FooterNote>
@@ -125,6 +188,10 @@ const HomePage: React.FC = () => {
           <CodeBadge>vigenere.ts</CodeBadge>
         </GithubLink>
       </LinkSection>
+
+      <CopyNotification $show={showCopyNotification}>
+        ✓ Скопировано в буфер обмена
+      </CopyNotification>
     </Container>
   );
 };

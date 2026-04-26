@@ -1,4 +1,4 @@
-import React, {useState, useMemo} from 'react';
+import React, {useState, useMemo, useCallback} from 'react';
 import {
   PageContainer,
   GraphContainer,
@@ -16,22 +16,38 @@ import {
   TextArea,
   FrequencyChart,
   FreqBar,
-  GammaBox, ChartWrapper, AverageLine, GraphSubtitle, GraphsContainer
+  GammaBox,
+  ChartWrapper,
+  AverageLine,
+  GraphSubtitle,
+  GraphsContainer, LinkSection, GithubLink, CodeBadge
 } from '../styles/StyledComponents';
 import {cleanText, vigenere} from '../crypto/vigenere.ts';
 import {CryptoAnalyzer} from '../crypto/CryptoAnalyzer.ts';
-import {ALPHABET, ENGLISH_FREQ} from "../types/constants.ts";
+import {ALPHABET, ENGLISH_FREQ, GITHUB_ALGORITHM2_URL, GITHUB_ALGORITHM_URL} from "../types/constants.ts";
 
 const CryptanalysisPage: React.FC = () => {
   const [ciphertext, setCiphertext] = useState<string>('CRYPTO');
   const [selectedPosition, setSelectedPosition] = useState<number>(0);
+  const [manualKeyLength, setManualKeyLength] = useState<number | null>(null);
 
   const {cryptoAnalyzer, decryptedText} = useMemo(() => {
-    const cryptoAnalyzer = new CryptoAnalyzer(ciphertext)
-    cryptoAnalyzer.analyze()
+    const cryptoAnalyzer = new CryptoAnalyzer(ciphertext);
+
+    if (manualKeyLength) {
+      cryptoAnalyzer.analyze(manualKeyLength)
+    } else {
+      cryptoAnalyzer.analyze()
+    }
+
     const decryptedText = vigenere(ciphertext, cryptoAnalyzer.guessedKey, "decrypt", "repeat").cipherText;
+
     return {cryptoAnalyzer, decryptedText};
-  }, [ciphertext]);
+  }, [ciphertext, manualKeyLength]);
+
+  const handleBarClick = useCallback((length: number) => {
+    setManualKeyLength(length === manualKeyLength ? null : length);
+  }, [manualKeyLength]);
 
   return (
     <PageContainer>
@@ -39,7 +55,10 @@ const CryptanalysisPage: React.FC = () => {
         <Label>Зашифрованный текст</Label>
         <TextArea
           value={ciphertext}
-          onChange={(e) => setCiphertext(cleanText(e.target.value))}
+          onChange={(e) => {
+            setCiphertext(cleanText(e.target.value));
+            setManualKeyLength(null);
+          }}
           placeholder="Введите шифротекст для взлома..."
         />
       </Section>
@@ -47,13 +66,16 @@ const CryptanalysisPage: React.FC = () => {
       {cryptoAnalyzer.ICResults.length > 0 && (
         <GraphContainer>
           <GraphTitle>Индекс совпадения для разных длин ключа</GraphTitle>
+          <GraphSubtitle>Кликните на любой столбец, чтобы выбрать длину ключа вручную</GraphSubtitle>
           <ChartWrapper>
             <BarChart>
               {cryptoAnalyzer.ICResults.map((result) => (
                 <Bar
                   key={result.length}
                   $height={(result.ic / cryptoAnalyzer.maxIC) * 100}
-                  $isMax={result.length === cryptoAnalyzer.keyLength}
+                  $isMax={result.length === cryptoAnalyzer.keyLength && !manualKeyLength}
+                  $isSelected={result.length === manualKeyLength}
+                  onClick={() => handleBarClick(result.length)}
                 />
               ))}
             </BarChart>
@@ -73,8 +95,27 @@ const CryptanalysisPage: React.FC = () => {
       {cryptoAnalyzer.keyLength > 0 && (
         <>
           <KeyLengthDisplay>
-            <p>Предполагаемая длина ключа</p>
-            <h2>{cryptoAnalyzer.keyLength}</h2>
+            <p>
+              {manualKeyLength ? 'Ручной выбор' : 'Предполагаемая длина ключа'}
+            </p>
+            <h2>{manualKeyLength || cryptoAnalyzer.keyLength}</h2>
+            {manualKeyLength && (
+              <button
+                onClick={() => setManualKeyLength(null)}
+                style={{
+                  background: 'rgba(255,255,255,0.2)',
+                  border: 'none',
+                  color: 'white',
+                  padding: '0.3rem 0.8rem',
+                  borderRadius: '12px',
+                  cursor: 'pointer',
+                  fontSize: '0.7rem',
+                  marginTop: '0.5rem'
+                }}
+              >
+                Сбросить на авто
+              </button>
+            )}
           </KeyLengthDisplay>
 
           <GuessedKeyDisplay>
@@ -140,13 +181,29 @@ const CryptanalysisPage: React.FC = () => {
           <ResultSection>
             <Section>
               <Label>Расшифрованный текст</Label>
-              <GammaBox style={{minHeight: '150px', whiteSpace: 'pre-wrap'}}>
-                {decryptedText || '(нет данных)'}
-              </GammaBox>
+              <TextArea
+                value={decryptedText || '(нет данных)'}
+                readOnly
+                placeholder="Расшифрованный текст появится здесь..."
+              />
             </Section>
           </ResultSection>
         </>
       )}
+      <LinkSection>
+        <GithubLink
+          href={GITHUB_ALGORITHM2_URL}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+            <path
+              d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.438 9.8 8.205 11.387.6.113.82-.26.82-.58 0-.287-.01-1.05-.015-2.06-3.338.726-4.042-1.61-4.042-1.61-.546-1.387-1.333-1.756-1.333-1.756-1.09-.745.082-.73.082-.73 1.205.085 1.84 1.237 1.84 1.237 1.07 1.834 2.807 1.304 3.492.997.108-.775.418-1.305.762-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.468-2.38 1.235-3.22-.123-.3-.535-1.52.117-3.16 0 0 1.008-.322 3.3 1.23.96-.267 1.98-.4 3-.405 1.02.005 2.04.138 3 .405 2.29-1.552 3.297-1.23 3.297-1.23.653 1.64.24 2.86.118 3.16.768.84 1.233 1.91 1.233 3.22 0 4.61-2.804 5.62-5.476 5.92.43.37.824 1.102.824 2.22 0 1.602-.015 2.894-.015 3.287 0 .322.216.698.83.578C20.565 21.795 24 17.295 24 12c0-6.63-5.37-12-12-12z"/>
+          </svg>
+          Посмотреть алгоритм на GitHub
+          <CodeBadge>CryptoAnalyzer.ts</CodeBadge>
+        </GithubLink>
+      </LinkSection>
     </PageContainer>
   );
 };

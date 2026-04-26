@@ -44,9 +44,12 @@ export class CryptoAnalyzer {
   constructor(public readonly cipherText: string) {
   }
 
-  analyze() {
+  analyze(manualKeyLength?: number) {
     this.findKeyLengths()
     this.getBestKeyLength()
+
+    if (manualKeyLength) this.keyLength = manualKeyLength;
+
     this.calculateSeparatedDistributions()
     this.guessKey()
   }

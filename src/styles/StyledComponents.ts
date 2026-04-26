@@ -185,7 +185,7 @@ export const AverageLine = styled.div<{ $topPercent: number, $average: number }>
     pointer-events: none;
 
     &::after {
-        content: 'IC ${props => props.$average}';
+        content: 'average IC ${props => props.$average}';
         position: absolute;
         right: 0;
         top: -20px;
@@ -227,15 +227,33 @@ export const BarChart = styled.div`
     }
 `;
 
-export const Bar = styled.div<{ $height: number; $isMax?: boolean }>`
+export const Bar = styled.div<{ $height: number; $isMax?: boolean; $isSelected?: boolean }>`
     flex: 1;
     height: ${props => props.$height}%;
-    background: ${props => props.$isMax ? '#3b82f6' : '#cbd5e1'};
-    transition: height 0.3s ease;
+    background: ${props => {
+        if (props.$isSelected) return '#10b981';
+        if (props.$isMax) return '#3b82f6';
+        return '#cbd5e1';
+    }};
+    transition: all 0.2s ease;
     cursor: pointer;
+    border-radius: 4px 4px 0 0;
+    position: relative;
 
     &:hover {
         opacity: 0.8;
+        transform: translateY(-2px);
+    }
+
+    &::after {
+        content: ${props => props.$isSelected ? '"✓"' : '""'};
+        position: absolute;
+        top: -20px;
+        left: 50%;
+        transform: translateX(-50%);
+        font-size: 12px;
+        color: #10b981;
+        font-weight: bold;
     }
 `;
 
@@ -360,4 +378,87 @@ export const GraphSubtitle = styled.p`
     margin-top: -0.5rem;
     margin-bottom: 1rem;
     text-align: center;
+`;
+
+export const ButtonGroup = styled.div`
+    display: flex;
+    gap: 0.75rem;
+    margin-top: 0.5rem;
+    flex-wrap: wrap;
+`;
+
+export const ActionButton = styled.button<{ $variant?: 'primary' | 'secondary' | 'success' }>`
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    background: ${props => {
+        switch (props.$variant) {
+            case 'primary':
+                return '#3b82f6';
+            case 'success':
+                return '#10b981';
+            default:
+                return '#f0f0f0';
+        }
+    }};
+    color: ${props => (props.$variant === 'primary' || props.$variant === 'success') ? 'white' : '#555'};
+    border: 1px solid ${props => {
+        switch (props.$variant) {
+            case 'primary':
+                return '#3b82f6';
+            case 'success':
+                return '#10b981';
+            default:
+                return '#e0e0e0';
+        }
+    }};
+    border-radius: 12px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    font-family: inherit;
+
+    &:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        background: ${props => {
+            switch (props.$variant) {
+                case 'primary':
+                    return '#2563eb';
+                case 'success':
+                    return '#059669';
+                default:
+                    return '#e8e8e8';
+            }
+        }};
+    }
+
+    &:active {
+        transform: translateY(0);
+    }
+
+    svg {
+        width: 14px;
+        height: 14px;
+        fill: currentColor;
+    }
+`;
+
+export const CopyNotification = styled.div<{ $show: boolean }>`
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: #10b981;
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border-radius: 12px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    opacity: ${props => props.$show ? 1 : 0};
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+    z-index: 1000;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 `;
