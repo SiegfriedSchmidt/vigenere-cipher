@@ -5,6 +5,9 @@ const GlobalStyles = createGlobalStyle`
         //width: 100vw;
         //height: 100vh;
         overflow-x: hidden;
+    }
+
+    * {
         box-sizing: border-box;
         margin: 0;
         padding: 0;

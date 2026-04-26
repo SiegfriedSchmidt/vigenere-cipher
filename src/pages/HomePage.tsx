@@ -4,7 +4,7 @@ import {
   CodeBadge,
   Container,
   FooterNote,
-  GammaBox, GithubLink,
+  GithubLink,
   Input,
   Label, LinkSection,
   Row,
@@ -91,9 +91,11 @@ const HomePage: React.FC = () => {
 
       <Section>
         <Label>Сгенерированная гамма</Label>
-        <GammaBox>
-          {gamma || '(нет данных)'}
-        </GammaBox>
+        <TextArea
+          value={gamma || '(нет данных)'}
+          readOnly
+          placeholder="Гамма появится здесь..."
+        />
       </Section>
 
       <Section>

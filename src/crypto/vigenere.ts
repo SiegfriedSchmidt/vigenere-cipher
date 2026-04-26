@@ -1,7 +1,5 @@
 import type {CipherMode, GammaMode} from "../types/general.ts";
-
-const CHAR_CODE_A = "A".charCodeAt(0) // номер символа A
-const M = 26 // мощность алфавита
+import {CHAR_CODE_A, M} from "../types/constants.ts";
 
 export function cleanText(text: string) { // оставить только символы из алфавита
   return text.toUpperCase().replace(/[^A-Z]/g, '');

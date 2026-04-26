@@ -169,12 +169,33 @@ export const PageContainer = styled.div`
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
 `;
 
-export const NavBar = styled.nav`
-    display: flex;
-    gap: 1rem;
-    margin-bottom: 2rem;
-    padding-bottom: 1rem;
-    border-bottom: 1px solid #eee;
+export const ChartWrapper = styled.div`
+    position: relative;
+    width: 100%;
+`;
+
+export const AverageLine = styled.div<{ $topPercent: number, $average: number }>`
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: ${props => props.$topPercent}%;
+    height: 2px;
+    background: #ef4444;
+    z-index: 2;
+    pointer-events: none;
+
+    &::after {
+        content: 'IC ${props => props.$average}';
+        position: absolute;
+        right: 0;
+        top: -20px;
+        font-size: 0.7rem;
+        color: #ef4444;
+        background: white;
+        padding: 0 4px;
+        white-space: nowrap;
+        border-radius: 4px;
+    }
 `;
 
 export const GraphContainer = styled.div`
@@ -198,6 +219,12 @@ export const BarChart = styled.div`
     gap: 2px;
     height: 200px;
     margin: 1rem 0;
+    min-width: 400px;
+
+    @media (max-width: 768px) {
+        gap: 1px;
+        height: 150px;
+    }
 `;
 
 export const Bar = styled.div<{ $height: number; $isMax?: boolean }>`
@@ -214,10 +241,16 @@ export const Bar = styled.div<{ $height: number; $isMax?: boolean }>`
 
 export const XAxis = styled.div`
     display: flex;
-    justify-content: space-around;
+    gap: 2px;
     margin-top: 0.5rem;
     font-size: 0.7rem;
     color: #888;
+
+    span {
+        flex: 1;
+        text-align: center;
+        min-width: 0;
+    }
 `;
 
 export const KeyLengthDisplay = styled.div`
@@ -294,16 +327,6 @@ export const ResultSection = styled.div`
     border-top: 1px solid #eee;
 `;
 
-export const TwoColumnLayout = styled.div`
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 2rem;
-
-    @media (max-width: 768px) {
-        grid-template-columns: 1fr;
-    }
-`;
-
 export const FrequencyChart = styled.div`
     display: flex;
     align-items: flex-end;
@@ -312,43 +335,29 @@ export const FrequencyChart = styled.div`
     margin: 1rem 0;
 `;
 
-export const FreqBar = styled.div<{ $height: number; $expectedHeight?: number }>`
+export const FreqBar = styled.div<{ $height: number }>`
     flex: 1;
     height: ${props => props.$height}%;
     background: #3b82f6;
-    position: relative;
     transition: height 0.3s ease;
+    border-radius: 4px 4px 0 0;
 
-    &::after {
-        content: '';
-        position: absolute;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        height: ${props => props.$expectedHeight || 0}%;
-        background: rgba(239, 68, 68, 0.3);
-        z-index: 1;
+    &:hover {
+        opacity: 0.8;
     }
 `;
 
-export const Legend = styled.div`
+export const GraphsContainer = styled.div`
     display: flex;
-    gap: 1rem;
-    margin-bottom: 1rem;
-    font-size: 0.7rem;
-
-    span {
-        display: inline-flex;
-        align-items: center;
-        gap: 0.3rem;
-    }
-
-    .actual {
-        color: #3b82f6;
-    }
-
-    .expected {
-        color: #ef4444;
-    }
+    flex-direction: column;
+    gap: 2rem;
+    margin-top: 1rem;
 `;
 
+export const GraphSubtitle = styled.p`
+    font-size: 0.8rem;
+    color: #666;
+    margin-top: -0.5rem;
+    margin-bottom: 1rem;
+    text-align: center;
+`;
