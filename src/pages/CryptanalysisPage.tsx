@@ -26,9 +26,10 @@ import {CryptoAnalyzer} from '../crypto/CryptoAnalyzer.ts';
 import {ALPHABET, ENGLISH_FREQ, GITHUB_ALGORITHM2_URL} from "../types/constants.ts";
 
 const CryptanalysisPage: React.FC = () => {
-  const [ciphertext, setCiphertext] = useState<string>('CRYPTO');
+  const [ciphertext, setCiphertext] = useState<string>('');
   const [selectedPosition, setSelectedPosition] = useState<number>(0);
   const [manualKeyLength, setManualKeyLength] = useState<number | null>(null);
+  const [distributionType, setDistributionType] = useState<'shifted' | 'separated'>('shifted');
 
   const {cryptoAnalyzer, decryptedText} = useMemo(() => {
     const cryptoAnalyzer = new CryptoAnalyzer(ciphertext);
@@ -136,20 +137,77 @@ const CryptanalysisPage: React.FC = () => {
               ))}
             </KeyPositionSelector>
 
+            <div style={{display: 'flex', gap: '0.5rem', margin: '1rem 0', justifyContent: 'center'}}>
+              <button
+                onClick={() => setDistributionType('separated')}
+                style={{
+                  padding: '0.4rem 1rem',
+                  background: distributionType === 'separated' ? '#3b82f6' : '#f0f0f0',
+                  color: distributionType === 'separated' ? 'white' : '#555',
+                  border: 'none',
+                  borderRadius: '20px',
+                  cursor: 'pointer',
+                  fontSize: '0.8rem',
+                  transition: 'all 0.2s'
+                }}
+              >
+                До сдвига
+              </button>
+              <button
+                onClick={() => setDistributionType('shifted')}
+                style={{
+                  padding: '0.4rem 1rem',
+                  background: distributionType === 'shifted' ? '#3b82f6' : '#f0f0f0',
+                  color: distributionType === 'shifted' ? 'white' : '#555',
+                  border: 'none',
+                  borderRadius: '20px',
+                  cursor: 'pointer',
+                  fontSize: '0.8rem',
+                  transition: 'all 0.2s'
+                }}
+              >
+                После сдвига
+              </button>
+            </div>
+
             <GraphsContainer>
               <GraphContainer>
-                <GraphTitle>Фактическое распределение
-                  (сдвиг {cryptoAnalyzer.shiftedDistributions.get(selectedPosition)?.shift})
-                </GraphTitle>
-                <GraphSubtitle>После применения предполагаемого сдвига ключа</GraphSubtitle>
-                <FrequencyChart>
-                  {cryptoAnalyzer.shiftedDistributions.get(selectedPosition)?.dist.map((freq, idx) => (
-                    <FreqBar
-                      key={idx}
-                      $height={freq * 100}
-                    />
-                  ))}
-                </FrequencyChart>
+                {distributionType === 'shifted' ?
+                  <>
+                    <GraphTitle>
+                      Фактическое распределение
+                      (сдвиг {cryptoAnalyzer.shiftedDistributions.get(selectedPosition)?.shift})
+                    </GraphTitle>
+                    <GraphSubtitle>
+                      После применения предполагаемого сдвига ключа
+                    </GraphSubtitle>
+                    <FrequencyChart>
+                      {cryptoAnalyzer.shiftedDistributions.get(selectedPosition)?.dist.map((freq, idx) => (
+                        <FreqBar
+                          key={idx}
+                          $height={freq * 100}
+                        />
+                      ))}
+                    </FrequencyChart>
+                  </> :
+                  <>
+                    <GraphTitle>
+                      Фактическое распределение (без сдвига)
+                    </GraphTitle>
+                    <GraphSubtitle>
+                      Исходное распределение
+                    </GraphSubtitle>
+                    <FrequencyChart>
+                      {cryptoAnalyzer.separatedDistributions.get(selectedPosition)?.map((freq, idx) => (
+                        <FreqBar
+                          key={idx}
+                          $height={freq * 100}
+                        />
+                      ))}
+                    </FrequencyChart>
+                  </>
+                }
+
                 <XAxis>
                   {ALPHABET.split('').map(letter => (
                     <span key={letter}>{letter}</span>

@@ -55,7 +55,7 @@ export class CryptoAnalyzer {
   }
 
   findKeyLengths() {
-    for (let length = 1; length <= this.maxKeyLength; length++) {
+    for (let length = 1; length <= Math.min(this.maxKeyLength, this.cipherText.length); ++length) {
       this.ICResults.push({length, ic: calculateICForLength(this.cipherText, length)});
     }
   }
@@ -71,7 +71,7 @@ export class CryptoAnalyzer {
     this.averageIC = this.averageIC / this.ICResults.length;
 
     for (const {length, ic} of this.ICResults) {
-      if (ic > this.averageIC) {
+      if (ic >= this.averageIC) {
         this.keyLength = length;
         break
       }
@@ -106,7 +106,7 @@ export class CryptoAnalyzer {
       }
       this.guessedKey = this.guessedKey + String.fromCharCode(guessedShift + CHAR_CODE_A)
       this.shiftedDistributions.set(keyIdx, {
-        shift: guessedShift,
+        shift: M - guessedShift,
         dist: dist.map((_, i) => dist[(i + guessedShift) % M])
       })
     }
