@@ -88,7 +88,7 @@ const HomePage: React.FC = () => {
       <Title>Шифр Виженера</Title>
 
       <Section>
-        <Label>Сообщение (только буквы A-Z)</Label>
+        <Label>Сообщение (только буквы A-Z) ({message.length})</Label>
         <TextArea
           value={message}
           onChange={handleMessageChange}

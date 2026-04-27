@@ -16,7 +16,6 @@ import {
   TextArea,
   FrequencyChart,
   FreqBar,
-  GammaBox,
   ChartWrapper,
   AverageLine,
   GraphSubtitle,
@@ -24,7 +23,7 @@ import {
 } from '../styles/StyledComponents';
 import {cleanText, vigenere} from '../crypto/vigenere.ts';
 import {CryptoAnalyzer} from '../crypto/CryptoAnalyzer.ts';
-import {ALPHABET, ENGLISH_FREQ, GITHUB_ALGORITHM2_URL, GITHUB_ALGORITHM_URL} from "../types/constants.ts";
+import {ALPHABET, ENGLISH_FREQ, GITHUB_ALGORITHM2_URL} from "../types/constants.ts";
 
 const CryptanalysisPage: React.FC = () => {
   const [ciphertext, setCiphertext] = useState<string>('CRYPTO');
@@ -52,7 +51,7 @@ const CryptanalysisPage: React.FC = () => {
   return (
     <PageContainer>
       <Section>
-        <Label>Зашифрованный текст</Label>
+        <Label>Зашифрованный текст ({ciphertext.length})</Label>
         <TextArea
           value={ciphertext}
           onChange={(e) => {
@@ -159,7 +158,7 @@ const CryptanalysisPage: React.FC = () => {
               </GraphContainer>
 
               <GraphContainer>
-                <GraphTitle>Ожидаемое распределение (английский язык)</GraphTitle>
+                <GraphTitle>Ожидаемое распределение</GraphTitle>
                 <GraphSubtitle>Эталонное распределение букв</GraphSubtitle>
                 <FrequencyChart>
                   {ENGLISH_FREQ.map((freq, idx) => (
